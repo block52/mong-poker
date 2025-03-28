@@ -205,6 +205,9 @@ const Table = () => {
     const [zoom, setZoom] = useState(calculateZoom());
     const [openSidebar, setOpenSidebar] = useState(false);
 
+    const [userSeat, setUserSeat] = useState<number | null>(null);  
+    const [userNFT, setUserNFT] = useState<string | null>(null);
+   
     const [flipped1, setFlipped1] = useState(false);
     const [flipped2, setFlipped2] = useState(false);
     const [flipped3, setFlipped3] = useState(false);
@@ -216,6 +219,17 @@ const Table = () => {
 
     const [dealerButtonPosition, setDealerButtonPosition] = useState({ left: "0px", top: "0px" });
     const [isDealerButtonVisible, setIsDealerButtonVisible] = useState(false);
+
+
+
+    useEffect(() => {
+        const savedNFT = localStorage.getItem("selectedNFT");
+        if (savedNFT) {
+            setUserNFT(savedNFT);
+        } else {
+            setUserNFT("https://ipfs.io/ipfs/bafybeiafzj33jeqrkbjjqjwprsctvstryo7p4w5ut32gu7762574g73wfa"); // Default NFT
+        }
+    }, []);
 
 
     // Add state for mouse position
@@ -387,16 +401,16 @@ const Table = () => {
 
             {/*//! HEADER - CASINO STYLE */}
             <div className="flex-shrink-0">
-                <div className="w-[100vw] h-[65px] bg-gradient-to-r from-[#1a2639] via-[#2a3f5f] to-[#1a2639] text-center flex items-center justify-between px-4 z-10 relative overflow-hidden border-b-2 border-[#3a546d]">
+                <div className="w-[100vw] h-[65px] bg-custom-mong from-[#1a2639] via-[#2a3f5f] to-[#1a2639] text-center flex items-center justify-between px-4 z-10 relative overflow-hidden border-b-2 border-[#3a546d]">
                     {/* Subtle animated background */}
                     <div className="absolute inset-0 z-0">
                         {/* Bottom edge glow */}
-                        <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#64ffda] to-transparent opacity-50"></div>
+                        <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-custom-mong from-transparent via-[#64ffda] to-transparent opacity-50"></div>
                     </div>
 
                     {/* Left Section - Lobby button */}
                     <div className="flex items-center space-x-3 z-10">
-                        <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-[#2c3e50] to-[#1e293b] rounded-full shadow-md border border-[#3a546d] hover:border-[#64ffda] transition-all duration-300" onClick={() => navigate("/")}>
+                        <div className="flex items-center justify-center w-10 h-10 bg-custom-mong from-[#2c3e50] to-[#1e293b] rounded-full shadow-md border border-[#3a546d] hover:border-[#64ffda] transition-all duration-300" onClick={() => navigate("/")}>
                             <IoMenuSharp size={20} className="text-[#64ffda]" />
                         </div>
                         <span className="text-white font-medium text-[20px] cursor-pointer hover:text-[#64ffda] transition-colors duration-300" onClick={() => navigate("/")}>
@@ -444,7 +458,7 @@ const Table = () => {
                             )}
                         </div>
 
-                        <div className="flex items-center justify-center w-10 h-10 cursor-pointer bg-gradient-to-br from-[#2c3e50] to-[#1e293b] rounded-full shadow-md border border-[#3a546d] hover:border-[#64ffda] transition-all duration-300">
+                        <div className="flex items-center justify-center w-10 h-10 cursor-pointer bg-custom-mong from-[#2c3e50] to-[#1e293b] rounded-full shadow-md border border-[#3a546d] hover:border-[#64ffda] transition-all duration-300">
                             <RiMoneyDollarCircleLine
                                 className="text-[#64ffda] hover:scale-110 transition-transform duration-200"
                                 size={22}
@@ -455,19 +469,11 @@ const Table = () => {
                 </div>
 
                 {/* SUB HEADER */}
-                <div className="bg-gray-900 text-white flex justify-between items-center p-2 h-[35px] relative overflow-hidden shadow-lg">
+                <div className="bg-custom-mong text-white flex justify-between items-center p-2 h-[35px] relative overflow-hidden shadow-lg">
                     {/* Animated background overlay */}
                     <div
-                        className="absolute inset-0 z-0 opacity-30"
-                        style={{
-                            backgroundImage: "linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(50,205,50,0.1) 25%, rgba(0,0,0,0) 50%, rgba(50,205,50,0.1) 75%, rgba(0,0,0,0) 100%)",
-                            backgroundSize: "200% 100%",
-                            animation: "shimmer 3s infinite linear"
-                        }}
+                        className="bg-custom-mong absolute inset-0 z-0"
                     />
-
-                    {/* Bottom edge shadow */}
-                    <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-green-400 to-transparent opacity-50"></div>
 
                     {/* Add the keyframe animation */}
                     <style>{`
@@ -520,49 +526,15 @@ const Table = () => {
                     {/*//! TABLE */}
                     <div className="flex-grow flex flex-col align-center justify-center min-h-[calc(100vh-350px)] z-[0] relative">
                         {/* Animated background overlay */}
-                        <div
-                            className="absolute inset-0 z-0 opacity-30"
-                            style={{
-                                backgroundImage: "linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(50,205,50,0.1) 25%, rgba(0,0,0,0) 50%, rgba(50,205,50,0.1) 75%, rgba(0,0,0,0) 100%)",
-                                backgroundSize: "200% 100%",
-                                animation: "shimmer 3s infinite linear"
-                            }}
-                        />
+
 
                         {/* Animated overlay */}
-                        <div
-                            className="absolute inset-0 z-0"
-                            style={{
-                                backgroundImage: `
-                                    repeating-linear-gradient(
-                                        ${45 + mousePosition.x / 10}deg,
-                                        rgba(42, 72, 65, 0.1) 0%,
-                                        rgba(61, 89, 80, 0.1) 25%,
-                                        rgba(30, 52, 47, 0.1) 50%,
-                                        rgba(50, 79, 71, 0.1) 75%,
-                                        rgba(42, 72, 65, 0.1) 100%
-                                    )
-                                `,
-                                backgroundSize: "400% 400%",
-                                animation: "gradient 15s ease infinite",
-                                transition: "background 0.5s ease"
-                            }}
-                        />
+
 
                         {/* Base gradient background */}
                         <div
-                            className="absolute inset-0 z-0"
-                            style={{
-                                backgroundImage: `
-                                    radial-gradient(circle at ${mousePosition.x}% ${mousePosition.y}%, rgba(42, 72, 65, 0.9) 0%, transparent 60%),
-                                    radial-gradient(circle at 0% 0%, rgba(42, 72, 65, 0.7) 0%, transparent 50%),
-                                    radial-gradient(circle at 100% 0%, rgba(61, 89, 80, 0.7) 0%, transparent 50%),
-                                    radial-gradient(circle at 0% 100%, rgba(30, 52, 47, 0.7) 0%, transparent 50%),
-                                    radial-gradient(circle at 100% 100%, rgba(50, 79, 71, 0.7) 0%, transparent 50%)
-                                `,
-                                filter: "blur(60px)",
-                                transition: "all 0.3s ease-out"
-                            }}
+                            className="absolute inset-0 z-0 bg-custom-mong"
+                            
                         />
 
                         <div className="zoom-wrapper"
@@ -578,7 +550,7 @@ const Table = () => {
                                 maxHeight: "calc(100vh - 180px)", // leave room for header/footer
                                 overflow: "visible", // ensure nothing is cut off
                             }}>
-                            <div className="flex-grow scrollbar-none bg-custom-table h-full flex flex-col justify-center items-center relative">
+                            <div className="flex-grow scrollbar-none bg-custom-mong h-full flex flex-col justify-center items-center relative">
                                 <div className="w-[900px] h-[450px] relative text-center block transform translate-y-[30px]">
                                     <div className="h-full flex align-center justify-center">
                                         <div className="z-20 relative flex flex-col w-[900px] h-[350px] left-1/2 top-5 transform -translate-x-1/2 text-center border-[3px] border-rgba(255, 255, 255, 0.2) border-solid rounded-full items-center justify-center shadow-[0_7px_15px_rgba(0,0,0,0.6)]">
@@ -724,13 +696,13 @@ const Table = () => {
                     </div>
 
                     {/*//! FOOTER */}
-                    <div className="flex-shrink-0 w-full h-[190px] bg-custom-footer text-center z-[10] flex justify-center">
+                    <div className="flex-shrink-0 w-full h-[190px] bg-custom-mong text-center z-[10] flex justify-center">
                         <PokerActionPanel />
                     </div>
                 </div>
                 {/*//! SIDEBAR */}
                 <div
-                    className={`fixed top-[0px] right-0 h-full bg-custom-header overflow-hidden transition-all duration-300 ease-in-out relative ${openSidebar ? "w-[300px]" : "w-0"
+                    className={`fixed top-[0px] right-0 h-full bg-custom-mong overflow-hidden transition-all duration-300 ease-in-out relative ${openSidebar ? "w-[300px]" : "w-0"
                         }`}
                     style={{
                         boxShadow: openSidebar ? "0px 0px 10px rgba(0,0,0,0.5)" : "none"

@@ -1,12 +1,9 @@
 import * as React from "react";
 import Badge from "../common/Badge";
 import ProgressBar from "../common/ProgressBar";
-
 import { PlayerStatus } from "@bitcoinbrisbane/block52";
-import { BigUnit } from "bigunit";
-import { useTableContext } from "../../../context/TableContext";
-import { formatWeiToDollars } from "../../../utils/numberUtils"; 
 import { ethers } from "ethers";
+import { useTableContext } from "../../../context/TableContext";
 
 // Enable this to see verbose logging
 const DEBUG_MODE = false;
@@ -19,8 +16,8 @@ const debugLog = (...args: any[]) => {
 };
 
 type PlayerProps = {
-    left?: string; // Front side image source
-    top?: string; // Back side image source
+    left?: string;
+    top?: string;
     index: number;
     currentIndex: number;
     color?: string;
@@ -30,33 +27,27 @@ type PlayerProps = {
 const Player: React.FC<PlayerProps> = ({ left, top, index, color, status }) => {
     const { tableData } = useTableContext();
 
-    debugLog("Player rendered with these props:", { left, top, index, color, status });
-    
-    // // Add debugging
-    // React.useEffect(() => {
-    //     console.log("Player component rendering for seat:", index);
-    //     console.log("Player component tableData:", tableData);
-    // }, [index, tableData]);
-    
-    // Get player data directly from the table data
+    const [avatar, setAvatar] = React.useState<string | null>(null);
+
+    React.useEffect(() => {
+        const savedNFT = localStorage.getItem("selectedNFT");
+        if (savedNFT) {
+            setAvatar(savedNFT);
+        }
+    }, []);
+
     const playerData = React.useMemo(() => {
         if (!tableData?.data?.players) return null;
         return tableData.data.players.find((p: any) => p.seat === index);
     }, [tableData, index]);
-    
+
     if (!playerData) {
         debugLog("Player component has no player data for seat", index);
         return <></>;
     }
-    
-    // Format stack value with ethers.js (more accurate for large numbers)
+
     const stackValue = playerData.stack ? Number(ethers.formatUnits(playerData.stack, 18)) : 0;
-    // Format for display with 2 decimal places
-    const formattedStackValue = stackValue.toFixed(2);
-    
-    // Get hole cards if available
     const holeCards = playerData.holeCards;
-    
 
     return (
         <div
@@ -70,29 +61,43 @@ const Player: React.FC<PlayerProps> = ({ left, top, index, color, status }) => {
                 transition: "top 1s ease, left 1s ease"
             }}
         >
+            {/* Avatar on the left of the cards */}
+            {avatar && (
+                <div className="absolute left-[-35px] top-[20px]">
+                    <img
+                        src={avatar}
+                        alt="Player Avatar"
+                        className="w-10 h-10 rounded-full border-2 border-white shadow-md"
+                    />
+                </div>
+            )}
+
             <div className="flex justify-center gap-1">
-                {playerData.holeCards && playerData.holeCards.length === 2 ? (
+                {holeCards && holeCards.length === 2 ? (
                     <>
-                        <img src={`/cards/${playerData.holeCards[0]}.svg`} width={60} height={80} />
-                        <img src={`/cards/${playerData.holeCards[1]}.svg`} width={60} height={80} />
+                        <img src={`/cards/${holeCards[0]}.svg`} width={60} height={80} />
+                        <img src={`/cards/${holeCards[1]}.svg`} width={60} height={80} />
                     </>
                 ) : (
-                    // Render nothing when no cards have been dealt yet
                     <div className="w-[120px] h-[80px]"></div>
                 )}
             </div>
+
             <div className="relative flex flex-col justify-end mt-[-6px] mx-1s">
                 <div
                     style={{ backgroundColor: "green" }}
-                    className={`b-[0%] mt-[auto] w-full h-[55px]  shadow-[1px_2px_6px_2px_rgba(0,0,0,0.3)] rounded-tl-2xl rounded-tr-2xl rounded-bl-md rounded-br-md flex flex-col`}
+                    className="b-[0%] mt-[auto] w-full h-[55px] shadow-[1px_2px_6px_2px_rgba(0,0,0,0.3)] rounded-tl-2xl rounded-tr-2xl rounded-bl-md rounded-br-md flex flex-col"
                 >
-                    {/* <p className="text-white font-bold text-sm mt-auto mb-1.5 self-center">+100</p> */}
                     <ProgressBar index={index} />
                     {playerData.status === PlayerStatus.FOLDED && (
-                        <span className="text-white animate-progress delay-2000 flex items-center w-full h-2 mb-2 mt-auto gap-2 justify-center">FOLD</span>
+                        <span className="text-white animate-progress delay-2000 flex items-center w-full h-2 mb-2 mt-auto gap-2 justify-center">
+                            FOLD
+                        </span>
                     )}
                     {playerData.status === PlayerStatus.ALL_IN && (
-                        <span className="text-white animate-progress delay-2000 flex items-center w-full h-2 mb-2 mt-auto gap-2 justify-center">All In</span>
+                        <span className="text-white animate-progress delay-2000 flex items-center w-full h-2 mb-2 mt-auto gap-2 justify-center">
+                            All In
+                        </span>
                     )}
                 </div>
                 <div className="absolute top-[0%] w-full">
