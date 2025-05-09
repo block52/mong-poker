@@ -152,7 +152,7 @@ const Dashboard: React.FC = () => {
 
     const buildUrl = () => {
         // return `/table/${typeSelected}?variant=${variantSelected}&seats=${seatSelected}`;
-        return `/table/0x22dfa2150160484310c5163f280f49e23b8fd34326`;
+        return `/`;
     };
 
     const handleNext = () => {
